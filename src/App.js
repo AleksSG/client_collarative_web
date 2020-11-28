@@ -4,7 +4,7 @@ import LandingPageContainer from './modules/landing-page/containers/LandingPageC
 const App = () => {
   return (
     <div className="App">
-      <h1>B</h1>
+      <h1>Upload a GCODE file</h1>
       <LandingPageContainer />
 
     </div>

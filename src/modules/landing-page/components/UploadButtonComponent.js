@@ -1,9 +1,12 @@
 const UploadButtonComponent = (props) => {
 
     return (
-        <button {...props}>
-            Upload
-        </button>
+        <div>
+            <input type="file" onChange={props.onChange} />
+            <button onClick={props.onClick}>
+                Upload
+            </button>
+        </div>
     );
 };
 
