@@ -1,5 +1,5 @@
 import LandingPageContainer from './modules/landing-page/containers/LandingPageContainer';
-
+import './Styles/App.css';
 
 const App = () => {
   return (
