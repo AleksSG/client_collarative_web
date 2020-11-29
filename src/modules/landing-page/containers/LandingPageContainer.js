@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
+//Other library with no that much success...
 import GCodeLoader from 'three-gcode-loader';
 
 //import { GCodeLoader } from "three/examples/jsm/loaders/GCodeLoader";
@@ -7,11 +8,14 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as THREE from "three";
 
 import UploadButtonComponent from '../components/UploadButtonComponent';
+import ThreeSceneContainer from './ThreeSceneContainer';
 
 
 const LandingPageContainer = () => {
 
-    var loader = new GCodeLoader()
+    const [object3D, setObject3D] = useState([[]]);
+
+    var loader = new GCodeLoader();
 
     // On file select (from the pop up)
     const onFileChange = event => {
@@ -21,60 +25,72 @@ const LandingPageContainer = () => {
         ).catch(e => console.log(e));
     };
 
-    // On file load
     const onFileLoad = () => {
+        loader.load(localStorage.getItem("fileGcode"), object => { setObject3D(object) });
+    }
 
-        const renderer = new THREE.WebGLRenderer();
-        // renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+    // useEffect(
+    //     () => {
+    //         let last = 0;
+    //         if (object3D) { last = object3D[0].length }
+    //         setLastLayer(last);
+    //     }, [object3D]);
 
-        const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-        camera.position.set(90, 100, 70);
-        camera.lookAt(0, 0, 0);
+    // useEffect(
+    //     () => {
+    //         const renderer = new THREE.WebGLRenderer();
+    //         renderer.setPixelRatio(window.devicePixelRatio);
+    //         renderer.setSize(window.innerWidth, window.innerHeight);
+    //         document.body.appendChild(renderer.domElement);
 
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color( 0x61ff00 );
-        const material = new THREE.LineBasicMaterial({ color: 0x61ff00 });
-        const geometry = new THREE.BufferGeometry();
+    //         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    //         let camPoint = { isVector3: true, x: 0, y: 0, z: 0 };
+    //         const scene = new THREE.Scene();
 
-        loader.load(localStorage.getItem("fileGcode"), object => {
-            console.log(object[0][20][13]);
+    //         const material = new THREE.LineBasicMaterial({ color: 0x61ff00 });
 
-            const positions = [];
-            object[0].forEach(layer => {
-                layer.forEach(linee => {
-                    linee.forEach(point => {
-                        if (point) {
-                            positions.push(new THREE.Vector3(point.x, point.y, point.z));
-                        }
-                    });
-                });
-            });
-            geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-            
+    //         loader.load(localStorage.getItem("fileGcode"), object => {
+    //             console.log(object[0].length);
+    //             setLastLayer(object[0].length);
+    //             if (object[0][3][0][0]) {
+    //                 camPoint = object[0][3][0][0];
+    //             }
+    //             const points = [];
+    //             console.log(firstLayer, lastLayer);
+    //             for (let l = firstLayer; l < lastLayer; l++) {
+    //                 object[0][l].forEach(linee => {
+    //                     linee.forEach(point => {
+    //                         if (point) {
+    //                             points.push(new THREE.Vector3(point.x, point.y, point.z));
+    //                         }
+    //                     });
+    //                 });
+    //             }
 
-            const line = new THREE.Line(geometry, material);
-            scene.add(line);
+    //             const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    //             const line = new THREE.Line(geometry, material);
+    //             scene.add(line);
 
-            renderer.render(scene, camera);
-        });
+    //             camera.lookAt(camPoint);
+    //             renderer.render(scene, camera);
 
-        // ############ START THREE JS LOADER
+    //         });
 
-        // loader.load(localStorage.getItem("fileGcode"), object => {
-        //     object.position.set( - 100, - 20, 100 );
-        //     console.log(object)
-        //     scene.add(object);
-        //     renderer.render(scene, camera);
-        // });
+    //         // ############ START THREE JS LOADER
+    //         // loader.load(localStorage.getItem("fileGcode"), object => {
+    //         //     object.position.set( - 100, - 20, 100 );
+    //         //     scene.add(object);
+    //         //     renderer.render(scene, camera);
+    //         // });
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.addEventListener( 'change', () => renderer.render(scene, camera) ); // use if there is no animation loop
-        controls.minDistance = 10;
-        controls.maxDistance = 100;
-
-    };
+    //         const controls = new OrbitControls(camera, renderer.domElement);
+    //         controls.addEventListener('change', () => {
+    //             camera.lookAt(camPoint);
+    //             renderer.render(scene, camera)
+    //         });
+    //         controls.minDistance = 10;
+    //         controls.maxDistance = 100;
+    //     }, [ firstLayer, lastLayer]);
 
     const getBase64 = file => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -86,6 +102,7 @@ const LandingPageContainer = () => {
     return (
         <div>
             <UploadButtonComponent onChange={onFileChange} onClick={onFileLoad} />
+            <ThreeSceneContainer gcodeData={object3D}/>
         </div>
 
     );
