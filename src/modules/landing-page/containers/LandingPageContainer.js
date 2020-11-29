@@ -11,7 +11,8 @@ import UploadButtonComponent from '../components/UploadButtonComponent';
 
 const LandingPageContainer = () => {
 
-    var loader = new GCodeLoader()
+    var loader = new GCodeLoader();
+    const [currentChild, setCurrentChild] = React.useState(null)
 
     // On file select (from the pop up)
     const onFileChange = event => {
@@ -27,7 +28,11 @@ const LandingPageContainer = () => {
         const renderer = new THREE.WebGLRenderer();
         // renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
+        if(currentChild != null){
+            document.body.removeChild(currentChild);
+        }
         document.body.appendChild(renderer.domElement);
+        setCurrentChild(renderer.domElement)
 
         const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
         camera.position.set(90, 100, 70);
